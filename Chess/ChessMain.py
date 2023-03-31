@@ -3,7 +3,7 @@ This is our main driver file. It will be responsible for handling user input and
 """
 
 import pygame as p
-from Chess2 import ChessEngine
+from Chess import ChessEngine
 
 WIDTH = HEIGHT = 512  # 400 is another option
 DIMENSION = 8  # dimensions of a chess board are 8x8
