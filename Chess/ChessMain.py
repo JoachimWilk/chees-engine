@@ -34,20 +34,25 @@ def main():
     clock = p.time.Clock()
     screen.fill(p.Color("white"))
     game_state = ChessEngine.GameState()
+    valid_moves = game_state.get_valid_moves()
+    move_made = False  # flag variable for when a move is made
+
     load_images()  # only do this once, before the while loop
     running = True
-    sqSelected = () #no square is selected, keep track of the last click of the user (tuple: (row, col))
-    playerClicks = [] #keep track of player clicks (two tuples: [(6,4),(4,4)]
+    sqSelected = ()  # no square is selected, keep track of the last click of the user (tuple: (row, col))
+    playerClicks = []  # keep track of player clicks (two tuples: [(6,4),(4,4)]
+
     while running:
         for e in p.event.get():
             if e.type == p.QUIT:
                 running = False
+                # mouse handlers
             elif e.type == p.MOUSEBUTTONDOWN:
-                location = p.mouse.get_pos() #(x,y) location of mouse
+                location = p.mouse.get_pos() # (x,y) location of mouse
                 col = location[0]//SQ_SIZE
                 row = location[1]//SQ_SIZE
-                if sqSelected == (row, col): #the user clicked the same square twice
-                    sqSelected =() #deselect
+                if sqSelected == (row, col): # the user clicked the same square twice
+                    sqSelected =() # deselect
                     playerClicks = []
                 else:
                     sqSelected = (row, col)
@@ -55,9 +60,20 @@ def main():
                 if len(playerClicks) == 2: #after 2nd click
                     move = ChessEngine.Move(playerClicks[0], playerClicks[1], game_state.board)
                     print(move.get_chess_notation())
-                    game_state.make_move(move)
+                    if move in valid_moves:
+                        game_state.make_move(move)
+                        move_made = True
                     sqSelected = () #reset user clicks
                     playerClicks = []
+            # key handlers
+            elif e.type == p.KEYDOWN:
+                if e.key == p.K_z:  # undo when 'z' is pressed
+                    game_state.undo_move()
+                    move_made = True
+
+        if move_made:
+            valid_moves = game_state.get_valid_moves()
+            move_made = False
 
         draw_game_state(screen, game_state)
         clock.tick(MAX_FPS)
